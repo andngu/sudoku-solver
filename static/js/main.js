@@ -10,6 +10,12 @@ function createGrid(gridData) {
            cell.type = 'text';
            cell.id = `cell-${i}-${j}`;
            cell.className = 'grid-cell';
+           if ((j + 1) % 3 === 0) {
+            cell.classList.add('right-border');
+          }
+           if ((i + 1) % 3 === 0) {
+            cell.classList.add('bottom-border');
+          }
            cell.value = gridData[i][j] !== 0 ? gridData[i][j] : '';
            cell.disabled = gridData[i][j] !== 0;  // disable input for pre-filled cells
            gridContainer.appendChild(cell);

@@ -9,12 +9,22 @@ body {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   margin-bottom: 20px;
+  border-top: 2px solid black;
+  border-left: 2px solid black;
 }
 
 .grid-cell {
   width: 60px;
   height: 60px;
   text-align: center;
+  border: 1px solid #ccc;
+}
+
+.grid-cell.right-border {
+  border-right: 2px solid black;
+}
+.grid-cell.bottom-border {
+  border-bottom: 2px solid black;
 }
 
 button {
