@@ -1,0 +1,23 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+#grid-container {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  margin-bottom: 20px;
+}
+
+.grid-cell {
+  width: 60px;
+  height: 60px;
+  text-align: center;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 20px;
+}
