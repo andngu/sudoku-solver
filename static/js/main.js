@@ -1,34 +1,108 @@
 const gridContainer = document.getElementById('grid-container');
 const newGameButton = document.getElementById('new-game');
 const solveGameButton = document.getElementById('solve-game');
+const numberSelectorContainer = document.getElementById('number-selector-container');
 
-function createGrid(gridData) {
-   gridContainer.innerHTML = ''; // clear existing grid
-   for(let i = 0; i < 9; i++) {
-       for(let j = 0; j < 9; j++) {
-           const cell = document.createElement('input');
-           cell.type = 'text';
-           cell.id = `cell-${i}-${j}`;
-           cell.className = 'grid-cell';
-           if ((j + 1) % 3 === 0) {
-            cell.classList.add('right-border');
-          }
-           if ((i + 1) % 3 === 0) {
-            cell.classList.add('bottom-border');
-          }
-           cell.value = gridData[i][j] !== 0 ? gridData[i][j] : '';
-           cell.disabled = gridData[i][j] !== 0;  // disable input for pre-filled cells
-           gridContainer.appendChild(cell);
-       }
-   }
+let selectedCell = null;
+let solvedBoard = [];
+let mistakes = 0;
+let isRunning = false;
+
+const createCell = (gridData, i, j) => {
+    const cell = document.createElement('input');
+    cell.type = 'text';
+    cell.readOnly = true;
+    cell.id = `cell-${i}-${j}`;
+    cell.className = 'grid-cell';
+    cell.value = gridData[i][j] !== 0 ? gridData[i][j] : '';
+    cell.disabled = gridData[i][j] !== 0;
+
+    if ((j + 1) % 3 === 0) cell.classList.add('right-border');
+    if ((i + 1) % 3 === 0) cell.classList.add('bottom-border');
+    
+    cell.addEventListener('click', handleCellClick(cell));
+    gridContainer.appendChild(cell);
 }
 
+function handleCellClick(cell) {
+    return function() {
+        if(!cell.disabled) {
+            if (selectedCell) selectedCell.classList.remove('selected');
+            selectedCell = cell;
+            selectedCell.classList.add('selected');
+        }
+    }
+}
+
+function createGrid(gridData) {
+    gridContainer.innerHTML = '';
+    gridData.forEach((row, i) => row.forEach((col, j) => createCell(gridData, i, j)));
+}
+
+function createNumberSelector() {
+    Array.from({length: 9}, (_, i) => i + 1).forEach(i => {
+        const numberCell = document.createElement('button');
+        numberCell.innerText = i;
+        numberCell.className = 'number-selector-cell';
+        numberCell.addEventListener('click', handleNumberCellClick(i));
+        numberSelectorContainer.appendChild(numberCell);
+    });
+}
+
+function handleNumberCellClick(i) {
+    return function() {
+        if(selectedCell){
+            checkCell(i);
+            selectedCell.classList.remove('selected');
+            selectedCell = null;
+        }
+    }
+}
+
+function checkCell(i) {
+    selectedCell.value = i;
+    const [_, row, col] = selectedCell.id.split('-');
+    if (solvedBoard[row][col] !== Number(selectedCell.value)) {
+        mistakes++;
+        if (mistakes >= 3) {
+            alert("You've made 3 mistakes");
+            newGameButton.click();
+        } else {
+            alert("Incorrect");
+            selectedCell.value = '';
+        }
+    }
+}
+
+function disableButtons() {
+    const buttons = [newGameButton, solveGameButton, ...numberSelectorContainer.getElementsByTagName('button')];
+    buttons.forEach(button => {
+        button.disabled = true;
+        button.classList.add('disabled');
+    });
+}
+
+function enableButtons() {
+    const buttons = [newGameButton, solveGameButton, ...numberSelectorContainer.getElementsByTagName('button')];
+    buttons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('disabled');
+    });
+}
+
+
 function animateSolution(history) {
-   console.log(history)
-   let i = 0;
-   const intervalId = setInterval(() => {
+    if (isRunning) return;
+    isRunning = true;
+    disableButtons();
+
+    let i = 0;
+    const intervalId = setInterval(() => {
        if (i >= history.length) {
            clearInterval(intervalId);
+           isRunning = false;
+           newGameButton.disabled = false;
+           newGameButton.classList.remove('disabled');
            return;
        }
 
@@ -42,13 +116,22 @@ function animateSolution(history) {
    }, 100);
 }
 
-newGameButton.onclick = function() {
-    fetch('/new_game')
-        .then(response => response.json())
-        .then(data => createGrid(data));
+async function fetchGame(url, options = {}) {
+    const response = await fetch(url, options);
+    if(!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+newGameButton.onclick = async function() {
+    const data = await fetchGame('/new_game');
+    createGrid(data.board);
+    solvedBoard = data.solved_board;
+    mistakes = 0;
+    selectedCell = null;
+    enableButtons();
 };
 
-solveGameButton.onclick = function() {
+solveGameButton.onclick = async function() {
     const gridData = Array.from(document.getElementsByClassName('grid-cell'))
         .map((cell, i) => {
             return {
@@ -58,23 +141,20 @@ solveGameButton.onclick = function() {
             };
         })
         .reduce((rows, cell) => {
-            if (!rows[cell.row]) {
-                rows[cell.row] = [];
-            }
+            if (!rows[cell.row]) rows[cell.row] = [];
             rows[cell.row][cell.col] = cell.value;
             return rows;
         }, []);
 
-    fetch('/solve', {
+    const options = {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({board: gridData})
-    })
-    .then(response => response.json())
-    .then(data => {animateSolution(data.history);});
+    };
+
+    const data = await fetchGame('/solve', options);
+    animateSolution(data.history);
 };
 
-// Load a new game when the page loads
 newGameButton.click();
+createNumberSelector();

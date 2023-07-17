@@ -50,7 +50,7 @@ def remove_numbers(board: List[List[int]]) -> None:
 def remove_numbers_from_subgrid(board: List[List[int]], start_row: int, start_col: int) -> None:
     # Remove a random number (between 2 and 6) of numbers from a 3x3 sub-grid
     cells = [(i, j) for i in range(start_row, start_row + 3) for j in range(start_col, start_col + 3)]
-    k = random.randint(2, 6)  # Number of cells to clear, between 2 and 6
+    k = random.randint(2, 5)  # Number of cells to clear, between 2 and 6
     for i, j in random.sample(cells, k):
         board[i][j] = 0
 

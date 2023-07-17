@@ -13,8 +13,10 @@ def index():
 def new_game():
     board = empty_grid()
     fill_values(board)
+    solved_board = copy.deepcopy(board)  # Store the solved board
     remove_numbers(board)  # Remove numbers after the board has been filled
-    return jsonify(board)
+    return jsonify({'board': board, 'solved_board': solved_board})
+
 
 @app.route('/solve', methods=['POST'])
 def solve_route():

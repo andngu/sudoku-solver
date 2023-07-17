@@ -1,16 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@100;200;300;400;500;600;700;800&display=swap");
+
+:root {
+  --primary-color: #1e3d59;
+  --secondary-color: #f4b41a;
+  --background-color: #f9f8f8;
+  --accent-color-1: #67ab9f;
+  --accent-color-2: #e15658;
+  --font-family: "Sora", sans-serif;
+}
+
+html,
 body {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  justify-content: center;
   align-items: center;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-family);
+  background-color: var(--primary-color);
+}
+
+#game-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 20px;
+}
+
+#control-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
 }
 
 #grid-container {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
-  margin-bottom: 20px;
   border-top: 2px solid black;
   border-left: 2px solid black;
+}
+
+#control-title {
+  color: var(--background-color);
 }
 
 .grid-cell {
@@ -18,11 +50,21 @@ body {
   height: 60px;
   text-align: center;
   border: 1px solid #ccc;
+  font-size: 40px;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--primary-color);
+}
+
+.grid-cell.selected {
+  background-color: var(--accent-color-1);
+  outline: none;
 }
 
 .grid-cell.right-border {
   border-right: 2px solid black;
 }
+
 .grid-cell.bottom-border {
   border-bottom: 2px solid black;
 }
@@ -30,4 +72,56 @@ body {
 button {
   margin: 5px;
   padding: 10px 20px;
+  font-family: var(--font-family);
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: none;
+  cursor: pointer;
+  width: 150px;
+}
+
+button:hover {
+  background-color: var(--accent-color-1);
+}
+
+button.disabled {
+  pointer-events: none; /* Disable pointer events on the button */
+  opacity: 0.6; /* Reduce opacity to indicate disabled state */
+  cursor: not-allowed; /* Show "not-allowed" cursor */
+}
+
+#number-selector-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* width: 200px; */
+}
+
+.number-selector-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid #000;
+  cursor: pointer;
+  font-size: 40px;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--primary-color);
+}
+
+.number-selector-cell:hover {
+  background-color: var(--accent-color-1);
+  color: white;
+}
+
+.number-selector-cell.selected {
+  background-color: var(--accent-color-2);
+  color: white;
+}
+
+.number-selector-cell.disabled {
+  pointer-events: none; /* Disable pointer events on the button */
+  opacity: 0.6; /* Reduce opacity to indicate disabled state */
+  cursor: not-allowed; /* Show "not-allowed" cursor */
 }

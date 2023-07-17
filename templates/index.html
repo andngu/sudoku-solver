@@ -5,11 +5,15 @@
     <link rel="stylesheet" type="text/css" href="/static/css/style.css">
 </head>
 <body>
-    <div id="grid-container">
-        <!-- Sudoku grid will be generated here by JavaScript -->
+    <div id="game-container">
+        <div id="grid-container"></div>
+        <div id="control-container">
+            <h2 id="control-title">Select a number</h2>
+        <div id="number-selector-container"></div>
+        <button id="new-game">New Game</button>
+        <button id="solve-game">Solve</button>
+        <script src="/static/js/main.js"></script>
+        </div>
     </div>
-    <button id="new-game">New Game</button>
-    <button id="solve-game">Solve Game</button>
-    <script src="/static/js/main.js"></script>
 </body>
 </html>
